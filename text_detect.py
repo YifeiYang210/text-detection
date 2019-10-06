@@ -3,6 +3,7 @@ import argparse
 import os
 import sys
 
+import math
 import numpy as np
 from PIL import Image
 from scipy.stats import mode, norm
@@ -12,11 +13,29 @@ import matplotlib.pyplot as plt
 import progressbar
 import pytesseract
 
+import alyn.skew_detect
+import alyn.deskew
+
+def skew_detect_canny(file_path):
+    sd = alyn.skew_detect.SkewDetect(
+        input_file=file_path,
+        display_output='Yes')
+    sd.run()
+
+def skew_pic(file_path):
+    d = alyn.deskew.Deskew(
+        input_file=file_path,
+        display_image=True,
+        # output_file='demo_o.jpg',
+        output_file="/".join(file_path.split("/")[:-1]) + "/" + file_path.split("/")[-1:][0].split(".")[:-1][0] + "_o.jpg",
+        r_angle=0)
+    d.run()
+
 ## Arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--image", type=str, help="Path to the input image")
 parser.add_argument("-o", "--output", type=str, help="Path to the output image")
-parser.add_argument("-d", "--direction", default='both+', type=str, choices=set(("light", "dark", "both", "both+")), help="Text searching")
+parser.add_argument("-d", "--direction", default='both+', type=str, choices={"light", "dark", "both", "both+"}, help="Text searching")
 parser.add_argument("-t", "--tesseract", action='store_true', help="Tesseract assistance")
 parser.add_argument("-f", "--fulltesseract", action='store_true', help="Full Tesseract")
 args = vars(parser.parse_args())
@@ -201,6 +220,12 @@ class TextDetection(object):
 		strokeWidths = 		np.delete(strokeWidths[:, 0], np.where(strokeWidths[:, 0] == np.Infinity))
 		return strokeWidths, strokeWidths_opp
 
+	def drawRect(img, pt1, pt2, pt3, pt4, color, lineWidth):
+		cv2.line(img, tuple(pt1), tuple(pt2), color, lineWidth)
+		cv2.line(img, tuple(pt2), tuple(pt3), color, lineWidth)
+		cv2.line(img, tuple(pt3), tuple(pt4), color, lineWidth)
+		cv2.line(img, tuple(pt1), tuple(pt4), color, lineWidth)
+
 	def detect(self):
 		res10 = np.zeros_like(self.img)
 		boxRes = self.img.copy()
@@ -281,10 +306,15 @@ class TextDetection(object):
 		if TESS:
 			print("Tesseract eliminates..")
 
+		angel_list = []
 		res = np.zeros_like(self.grayImg)
 		dilated = cv2.dilate(binarized.copy(), kernel, iterations=ITERATION)
 		image, contours, hierarchies = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		for i, (contour, hierarchy) in enumerate(zip(contours, hierarchies[0])):
+			perimeter = cv2.arcLength(contour,True)
+			area = cv2.contourArea(contour)
+			if perimeter <= 500 and area <= 5000:
+				continue
 			if hierarchy[-1] == -1:
 
 				if TESS:
@@ -308,11 +338,18 @@ class TextDetection(object):
 
 				else:
 					rect = cv2.minAreaRect(contour)
+					angel_list.append(rect[2])	 # angle
 					box = cv2.boxPoints(rect)
 					box = np.int0(box)
 					cv2.drawContours(self.final, [box], 0, (0, 255, 0), 2)
 					cv2.drawContours(res, [box], 0, 255, -1)
 
+		print("旋转角度：", angel_list)
+		cv2.imshow("res",res)
+		cv2.imwrite("d/test.jpg",res)
+		# @yyf
+		skew_detect_canny("d/test.jpg")
+		skew_pic("d/test.jpg")
 		return res
 
 	def fullOCR(self):
@@ -325,7 +362,7 @@ class TextDetection(object):
 			return bounded, res
 
 		boxes = pytesseract.image_to_boxes(Image.open(self.imagaPath))
-		boxes = [map(int, i) for i in [b.split(" ")[1:-1] for b in boxes.split("\n")]]
+		boxes = [list(map(int, i)) for i in [b.split(" ")[1:-1] for b in boxes.split("\n")]]
 
 		for box in boxes:
 			b = (int(box[0]), int(H - box[1]), int(box[2]), int(H - box[3]))
