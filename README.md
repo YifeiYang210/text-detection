@@ -1,7 +1,9 @@
-# text-detection
+# text-direction-detection
 
-This project aims to detect text regions in images using only image processing techniques with MSER (Maximally Stable Extremal Regions) and SWT (Stroke Width Transform).  And also [Tesseract-OCR](https://opensource.google.com/projects/tesseract.)
+This project aims to detect text detection in images using only image processing techniques with Baidu-OCR (Baidu AI service) and MSER (Maximally Stable Extremal Regions) and SWT (Stroke Width Transform).  And also [Tesseract-OCR](https://opensource.google.com/projects/tesseract.)
 tool is used optionally, as assistance to the algorithm.
+
+Baidu AI service to detect text detection (0 90 180 270): https://ai.baidu.com/docs#/OCR-Python-SDK/top 
 
 Please cite original paper:
 
@@ -17,6 +19,10 @@ Insall requirements.txt file
 Or you can create conda environment with 
 
 `conda env create -f requirements.yml`
+
+if error, then type
+
+`pip install baidu-aip`
 
 For OCR assistance, install Tesseract from package manager
 
@@ -54,9 +60,9 @@ For more detail (seeing intermediate steps), the usage given below is also avail
 
 ![sample2](images/figure_2.png)
 
-![sample3](images/figure_3.png)
+![sample3](images/81.jpg)
 
-![sample4](images/figure_4.png)
+![sample4](images/231.jpg)
 
 
 ## REFERENCES
