@@ -16,3 +16,4 @@ six==1.11.0
 sshuttle==0.78.3
 subprocess32==3.5.2
 virtualenv==15.2.0
+baidu-aip==2.2.17.0
