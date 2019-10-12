@@ -317,13 +317,13 @@ class TextDetection(object):
 
         # 4.get minArea rectangle
         self.get_minArea_angle(self.dilated, 200, 2000)
-        print("minArea法旋转角度：", self.angle_list)
+        print("get minArea rectangle & angle_list：", self.angle_list)
 
         # io1: display chosen minArea
         # cv2.imshow("res", res)
 
         # io2: write chosen minArea to disk
-        print("新写入二值化文件的路径：", self.new_pic_path)
+        print("write chosen minArea_pic to disk.", self.new_pic_path)
         cv2.imwrite(self.new_pic_path, self.res)
 
         # 5.cal skew angle needs to be rectified
@@ -334,7 +334,7 @@ class TextDetection(object):
         # 6.get rectified angle
         direction = self.baidu_ocr(self.imagaPath)
         angle_final = self.get_skew_angle(ans_res, direction)
-        print("最终输出的角度是；", angle_final)
+        print("final_angles:", angle_final)
 
         # rotate if needed
         # self.skew_pic_minArea(self.img, ans_res)
@@ -386,8 +386,8 @@ class TextDetection(object):
     def cal_skew_angle(self):
         # first eliminates errors that intentionally cause offset rotation
         if self.angle_list.count(0) / len(self.angle_list) >= 0.35 and self.angle_list.count(0) >= 15:
-            print("0占比过高", self.angle_list.count(0) / len(self.angle_list), self.angle_list.count(0))
-            print("最终输出的角度是；0")
+            print("0 conquers.", self.angle_list.count(0) / len(self.angle_list), self.angle_list.count(0))
+            print("final_angle:0")
             exit(0)
         angle_str_list = [self.get_cut_num(str(i), 1) for i in self.angle_list]
         angle_float_list = [float(i) for i in angle_str_list]
@@ -497,7 +497,7 @@ class TextDetection(object):
         options["detect_direction"] = "true"
         result = client.basicGeneral(img, options)
         direct = result['direction']
-        print("文字方向:" + str(direct))
+        print("baidu-ocr-text-direction-id:" + str(direct))
         return direct
 
     def get_cut_num(self, f_str, n):
