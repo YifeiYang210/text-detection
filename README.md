@@ -20,15 +20,19 @@ Or you can create conda environment with
 
 `conda env create -f requirements.yml`
 
-if error, then type
-
-`pip install baidu-aip`
-
 For OCR assistance, install Tesseract from package manager
 
 `sudo apt install tesseract-ocr`
 
 ## USAGE
+
+demo usage is
+
+`mkdir o`
+
+`python text_detect.py -i pic/198.jpg -o o/198.jpg -d both+`
+
+then you can find `o/198.jpg` with the prediction angle in the upper left corner of the picture.
 
 Basic usage is
 
@@ -45,14 +49,6 @@ More options available
 Option *-i* is image path, *-o* is output path, *-d* is SWT direction (default is `both+`), *-t* option chooses if Tesseract will be used. Normally Tesseract runs poorly if whole image given as input.
 But I use it for final decision of bounding boxes and it is not required all the time.
 
-If you want to give whole image to Tesseract to see the impact of the algorithm, try this.
-
-`python text_detection.py -i images/scenetext01.jpg -f`
-
-For more detail (seeing intermediate steps), the usage given below is also available.
-
-`python text_detection_detail.py -i images/scenetext01.jpg -d both+ -t`
-
 
 ## Sample Results
 
@@ -63,7 +59,6 @@ For more detail (seeing intermediate steps), the usage given below is also avail
 ![sample3](images/81.jpg)
 
 ![sample4](images/231.jpg)
-
 
 ## REFERENCES
 
