@@ -501,9 +501,9 @@ class TextDetection(object):
         return direct
 
     def get_cut_num(self, f_str, n):
-        f_str = str(f_str)  # f_str = '{}'.format(f_str) 也可以转换为字符串
+        f_str = str(f_str)  # f_str = '{}'.format(f_str) try format
         a, b, c = f_str.partition('.')
-        c = (c + "0" * n)[:n]  # 如论传入的函数有几位小数，在字符串后面都添加n为小数0
+        c = (c + "0" * n)[:n]  # fill 0
         return ".".join([a, c])
 
     def get_max_cnt_list(self, lt):
